@@ -12,7 +12,7 @@ public:
 
 	Rectangle(){}
 
-	Rectangle(int R, int G, int B)
+	void preencher(int R, int G, int B)
 	{
 		this->R = R;
 		this->G = G;

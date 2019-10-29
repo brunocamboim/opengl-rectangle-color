@@ -65,12 +65,17 @@ int main() {
 	glewExperimental = GL_TRUE;
 	glewInit();
 
-	int height = SCR_WIDTH / 40;
-	int width = SCR_WIDTH / 20;
+	int height1 = SCR_WIDTH / 40;
+	int width1 = SCR_WIDTH / 20;
 
-	Rectangle *rectangle = new Rectangle[width * height];
+	Rectangle *rectangle = new Rectangle[width1 * height1];
 
+	//s rand(mudar semente)
+	for (int i = 0; i < width1 * height1; i++) {
 
+		rectangle[i].preencher(rand() % 256, rand() % 256, rand() % 256);
+
+	}
 
 	float vertices[] = {
 		// positions          // colors           // texture coords
