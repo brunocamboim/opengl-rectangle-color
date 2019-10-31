@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <time.h>
 
 #include "TileMap.h"
 #include "TileSet.h"
@@ -71,10 +72,11 @@ int main() {
 	Rectangle *rectangle = new Rectangle[width1 * height1];
 
 	//s rand(mudar semente)
+	srand(time(NULL));
 	for (int i = 0; i < width1 * height1; i++) {
 
 		rectangle[i].preencher(rand() % 256, rand() % 256, rand() % 256);
-
+		printf("%d ", rectangle[i].R);
 	}
 
 	float vertices[] = {
@@ -200,8 +202,8 @@ int main() {
 
 	
 	
-	TileSet tileSet("bin/Images/wall.png", 0.1f, 0.1f, 10, 58, 154.0f, 77.0f);
-	TileMap tileMap("bin/Images/tilemap.csv", 10, 10, tileSet, 32);
+	//TileSet tileSet("bin/Images/wall.png", 0.1f, 0.1f, 10, 58, 154.0f, 77.0f);
+	//TileMap tileMap("bin/Images/tilemap.csv", 10, 10, tileSet, 32);
 
 	//tileSetCenario = TileSet::TileSet("bin/Images/wall.png", 0.1f, 0.1f, 10, 58, 154.0f, 77.0f);
 	//TileMap tilemapCenario("bin/Images/tilemap.csv", 10, 10, tileSetCenario, 32);
@@ -239,77 +241,24 @@ int main() {
 
 		glBindVertexArray(vao[0]);
 
-		float* offsets;
-		for (int i = 0; i < tileMap.numLinhas; i++)
-		{
-			for (int j = tileMap.numColunas - 1; j >= 0; j--)
-			{
-				//translação do tile (em x e y baseado em c e r) 
-				offsets = tileMap.GetTileOffset(i, j);
+		glUniform1f(
+			glGetUniformLocation(shader_programme, "imagem"), 1);
+		glUniform1f(
+			glGetUniformLocation(shader_programme, "tamanho"), 1);
+		glUniform1f(
+			glGetUniformLocation(shader_programme, "offsetx"), 0);
+		glUniformMatrix4fv(
+			glGetUniformLocation(shader_programme, "matrix"), 1,
+			GL_FALSE, glm::value_ptr(glm::mat4(1)));
 
-				glm::mat4 transformation = glm::translate(
-					matrix_origem,
-					glm::vec3(
-						j * tileMap.TW_CENTRO + i * tileMap.TW_CENTRO,
-						(j * tileMap.TH_CENTRO - i * tileMap.TH_CENTRO) + (tileMap.numLinhas * tileMap.TH_CENTRO) + tileMap.TH_CENTRO - tileSet.alturaTiles, 
-						0.0f
-					)
-				);
+		glUniform1f(
+			glGetUniformLocation(shader_programme, "offsety"), 1);
+		glUniform1f(
+			glGetUniformLocation(shader_programme, "layer_z"), -0.45);
 
-				//GL_POSITION
-				float tx = j * tileMap.TW;
-				float ty = i * tileMap.TH;
-
-				//TEXTURE
-				float CT = offsets[0];
-				float RT = offsets[1];
-
-				float TTW = 0;
-				float TTH = 0;
-				float sx = CT * TTW;
-				float sy = RT * TTH;
-
-
-				glUniformMatrix4fv(
-					glGetUniformLocation(shader_programme, "matrix"), 1,
-					GL_FALSE, glm::value_ptr(glm::mat4(1)));
-				glUniform1f(
-					glGetUniformLocation(shader_programme, "x"), tileSet.x);
-				glUniform1f(
-					glGetUniformLocation(shader_programme, "y"), tileSet.y);
-				glUniform1f(
-					glGetUniformLocation(shader_programme, "offsetx"), CT);
-				glUniform1f(
-					glGetUniformLocation(shader_programme, "offsety"), RT);
-
-				// bind Texture
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, tileSet.GetTextureID());
-				glUniform1i(glGetUniformLocation(shader_programme, "sprite"), 0);
-				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-				
-			}
-		}
-
-		for (int r = 0; r < 4; r++) {
-			for (int c = 0; c < 8; c++) {
-				//translação do tile (em x e y baseado em c e r) 
-				//vertex shader:
-				//tx = c * tw
-				//ty = r * th
-				
-				//coluna textura e linhas textura
-				//define coordenadas x e y de mapeamento de textura
-				//CT = ID % TTC;
-				//RT = ID / TTC;
-				//fragment shader:
-				//vt.x = CT * TTW;
-				//vt.y = RT * TTH;
-
-				//desenha triângulos para o tile
-
-			}
-		}
+		glBindTexture(GL_TEXTURE_2D, texture1);
+		glUniform1i(glGetUniformLocation(shader_programme, "sprite"), 0);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(g_window);
 		glfwPollEvents();
