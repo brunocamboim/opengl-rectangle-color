@@ -23,20 +23,7 @@ const unsigned int SCR_HEIGHT = 600;
 glm::mat4 matrix_origem = glm::mat4(1);
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-// actions are GLFW_PRESS, GLFW_RELEASE or GLFW_REPEAT
 {
-	if (key == GLFW_KEY_LEFT)
-	{
-		
-	}
-	else if (key == GLFW_KEY_RIGHT)
-	{
-		
-	}
-	else if (key == GLFW_KEY_SPACE)
-	{
-
-	}
 }
 
 
@@ -76,15 +63,15 @@ int main() {
 	for (int i = 0; i < width1 * height1; i++) {
 
 		rectangle[i].preencher(rand() % 256, rand() % 256, rand() % 256);
-		printf("%d ", rectangle[i].R);
+
 	}
 
 	float vertices[] = {
 		// positions          // colors           // texture coords
-		0.0f, 480.0f, 0.0f,   1.0f, 1.0f, // buttom right
+		0.0f, 20.0f, 0.0f,   1.0f, 1.0f, // buttom right
 		0.0f, 0.0f, 0.0f,   1.0f, 0.0f, // top left
-		640.0f, 0.0f, 0.0f,   0.0f, 0.0f, // bottom left
-		640.0f, 480.0f, 0.0f,   0.0f, 1.0f //top right
+		40.0f, 0.0f, 0.0f,   0.0f, 0.0f, // bottom left
+		40.0f, 20.0f, 0.0f,   0.0f, 1.0f //top right
 	};
 
 	unsigned int indices[] = {
@@ -140,12 +127,14 @@ int main() {
 
 		"out vec4 frag_color;"
 
+		"uniform vec3 color2;"
+
 		"void main () {"
-			"vec4 texel = texture (sprite, vec2((texture_coords.x + offsetx), texture_coords.y + offsety));"
+			/*"vec4 texel = texture (sprite, vec2((texture_coords.x + offsetx), texture_coords.y + offsety));"
 			"if (texel.a < 0.5) {"
 				"discard;"
-			"}"
-			"frag_color = texel;"
+			"}"*/
+			"frag_color = vec4 (color2, 1.0);"
 		"}";
 
 	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
@@ -161,68 +150,21 @@ int main() {
 	glAttachShader(shader_programme, vs);
 	glLinkProgram(shader_programme);
 
-
-	unsigned int texture1;
-	glGenTextures(1, &texture1);
-	glBindTexture(GL_TEXTURE_2D, texture1); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
-										   // set the texture wrapping parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	// set texture filtering parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load image, create texture and generate mipmaps
-	int width, height, nrChannels;
-	// The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
-	unsigned char *data = stbi_load("bin/Images/wall.png", &width, &height, &nrChannels, SOIL_LOAD_RGBA);
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	stbi_image_free(data);
-
 	glUseProgram(shader_programme);
 	glfwSetKeyCallback(g_window, key_callback);
-
-	glUniform1i(glGetUniformLocation(shader_programme, "texture1"), 0);
-
-	//int matrixLocation = glGetUniformLocation(shader_programme, "matrix");
-	//glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, matrix);
 	
 	glm::mat4 proj = glm::ortho(0.0f, (float) SCR_WIDTH, (float) SCR_HEIGHT, 0.0f, -1.0f, 1.0f);
 	glUniformMatrix4fv(
 		glGetUniformLocation(shader_programme, "proj"), 1,
 		GL_FALSE, glm::value_ptr(proj));
 
-	
-	
-	//TileSet tileSet("bin/Images/wall.png", 0.1f, 0.1f, 10, 58, 154.0f, 77.0f);
-	//TileMap tileMap("bin/Images/tilemap.csv", 10, 10, tileSet, 32);
-
-	//tileSetCenario = TileSet::TileSet("bin/Images/wall.png", 0.1f, 0.1f, 10, 58, 154.0f, 77.0f);
-	//TileMap tilemapCenario("bin/Images/tilemap.csv", 10, 10, tileSetCenario, 32);
-
-	//tileSetCenario = TileSet::TileSet("bin/Images/wall.png", 0.1f, 0.1f, 10, 58, 154.0f, 77.0f);
-	//TileMap::TileMap("bin/Images/tilemap.csv", 10, 10, tileSetCenario, 32);
-
 	float speed = 1.0f;
 	float lastPosition = 0.0f;
 
-	float layers[1];
-	layers[0] = texture1;
+	glm::mat4 matrix_triangle = glm::translate(glm::mat4(1), glm::vec3(0, 0, 0));
+	matrix_triangle = glm::translate(glm::mat4(1), glm::vec3(20, 40, 0.0f));
 
-	float layersZ[1];
-	layersZ[0] = -0.50;
-
-	float vao[1];
-	vao[0] = VAO;
-
+	int teste = false;
 	while (!glfwWindowShouldClose(g_window))
 	{
 		processInput(g_window);
@@ -239,26 +181,47 @@ int main() {
 		glUseProgram(shader_programme);
 
 
-		glBindVertexArray(vao[0]);
+		glBindVertexArray(VAO);
 
-		glUniform1f(
-			glGetUniformLocation(shader_programme, "imagem"), 1);
-		glUniform1f(
-			glGetUniformLocation(shader_programme, "tamanho"), 1);
-		glUniform1f(
-			glGetUniformLocation(shader_programme, "offsetx"), 0);
-		glUniformMatrix4fv(
-			glGetUniformLocation(shader_programme, "matrix"), 1,
-			GL_FALSE, glm::value_ptr(glm::mat4(1)));
+		for (int i = 0; i < 2; i++) {
+			
+			if (!teste) {
+				matrix_triangle = glm::translate(matrix_triangle, glm::vec3((float)i, 0, 0.0f));
+				glUniformMatrix4fv(
+					glGetUniformLocation(shader_programme, "matrix"), 1,
+					GL_FALSE, glm::value_ptr(matrix_triangle));
+			}
+			else {
+				glUniformMatrix4fv(
+					glGetUniformLocation(shader_programme, "matrix"), 1,
+					GL_FALSE, glm::value_ptr(glm::mat4(1)));
+			}
 
-		glUniform1f(
-			glGetUniformLocation(shader_programme, "offsety"), 1);
-		glUniform1f(
-			glGetUniformLocation(shader_programme, "layer_z"), -0.45);
+			glm::vec3 lightColor(0.0f, 1.0f, 0.0f);
+			glUniform3fv(glGetUniformLocation(shader_programme, "color2"), 1,
+				glm::value_ptr(lightColor));
 
-		glBindTexture(GL_TEXTURE_2D, texture1);
-		glUniform1i(glGetUniformLocation(shader_programme, "sprite"), 0);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			
+			glUniform1f(
+				glGetUniformLocation(shader_programme, "tamanho"), 1);
+			
+			glUniform1f(
+				glGetUniformLocation(shader_programme, "layer_z"), -0.45);
+
+			//glUniform1i(glGetUniformLocation(shader_programme, "sprite"), 0);
+			/*glUniform1f(
+				glGetUniformLocation(shader_programme, "offsetx"), 0);
+
+			glUniform1f(
+				glGetUniformLocation(shader_programme, "offsety"), 1);*/
+			/*glUniform1f(
+				glGetUniformLocation(shader_programme, "imagem"), 1);*/
+
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		}		
+
+		teste = true;
 
 		glfwSwapBuffers(g_window);
 		glfwPollEvents();
