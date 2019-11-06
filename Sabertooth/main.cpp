@@ -163,6 +163,7 @@ int main() {
 
 	glm::mat4 matrix_triangle = glm::translate(glm::mat4(1), glm::vec3(0, 0, 0));
 	matrix_triangle = glm::translate(glm::mat4(1), glm::vec3(20, 40, 0.0f));
+	glm::mat4 matrix_aux = glm::translate(glm::mat4(1), glm::vec3(20, 40, 0.0f));
 
 	int teste = false;
 	while (!glfwWindowShouldClose(g_window))
@@ -180,24 +181,26 @@ int main() {
 		
 		glUseProgram(shader_programme);
 
+		int indice = 0;
+		int columns = 0;
+		int rows = 0;
+		for (int i = 0; i < (width1 * height1); i++) {
 
-		glBindVertexArray(VAO);
+			glBindVertexArray(VAO);
 
-		for (int i = 0; i < 2; i++) {
-			
-			if (!teste) {
-				matrix_triangle = glm::translate(matrix_triangle, glm::vec3((float)i, 0, 0.0f));
-				glUniformMatrix4fv(
-					glGetUniformLocation(shader_programme, "matrix"), 1,
-					GL_FALSE, glm::value_ptr(matrix_triangle));
-			}
-			else {
-				glUniformMatrix4fv(
-					glGetUniformLocation(shader_programme, "matrix"), 1,
-					GL_FALSE, glm::value_ptr(glm::mat4(1)));
+			if (columns == 20) {
+				columns = 0;
+				rows += 1;
 			}
 
-			glm::vec3 lightColor(0.0f, 1.0f, 0.0f);
+			matrix_aux = glm::translate(glm::mat4(1), glm::vec3((columns++) * 40, (rows)*20, 0.0f));
+
+			glUniformMatrix4fv(
+				glGetUniformLocation(shader_programme, "matrix"), 1,
+				GL_FALSE, glm::value_ptr(matrix_aux));
+
+
+			glm::vec3 lightColor((float) rectangle[i].R / 255, (float) rectangle[i].G / 255, (float)rectangle[i].B / 255);
 			glUniform3fv(glGetUniformLocation(shader_programme, "color2"), 1,
 				glm::value_ptr(lightColor));
 

@@ -5,9 +5,9 @@ c:\users\bruno\documents\opengl\opengl-rectangle-color\sabertooth\tilemap.h(64):
 c:\users\bruno\documents\opengl\opengl-rectangle-color\sabertooth\main.cpp(13): warning C4005: 'EXIT_FAILURE': redefinição de macro
   c:\program files (x86)\windows kits\10\include\10.0.17763.0\ucrt\stdlib.h(49): note: consulte a definição anterior de 'EXIT_FAILURE'
 c:\users\bruno\documents\opengl\opengl-rectangle-color\sabertooth\main.cpp(62): warning C4244: 'argumento': conversão de 'time_t' para 'unsigned int', possível perda de dados
-c:\users\bruno\documents\opengl\opengl-rectangle-color\sabertooth\main.cpp(175): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
 c:\users\bruno\documents\opengl\opengl-rectangle-color\sabertooth\main.cpp(176): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
-c:\users\bruno\documents\opengl\opengl-rectangle-color\sabertooth\main.cpp(209): warning C4305: 'argumento': truncamento de 'double' para 'GLfloat'
+c:\users\bruno\documents\opengl\opengl-rectangle-color\sabertooth\main.cpp(177): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
+c:\users\bruno\documents\opengl\opengl-rectangle-color\sabertooth\main.cpp(212): warning C4305: 'argumento': truncamento de 'double' para 'GLfloat'
   SOIL.lib(SOIL.obj) : MSIL .netmodule ou módulo compilado com /GL encontrado; reiniciando link com /LTCG; adicione /LTCG ao link da linha de comando para melhorar performance do vinculador
 LINK : warning LNK4075: ignorando '/INCREMENTAL' devido a especificaþÒo '/LTCG'
 LINK : warning LNK4098: defaultlib 'MSVCRT' conflita com uso de outras bibliotecas; use /NODEFAULTLIB:library
