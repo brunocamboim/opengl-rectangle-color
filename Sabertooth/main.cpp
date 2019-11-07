@@ -20,12 +20,79 @@ void processInput(GLFWwindow *window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 650;
 
+const unsigned int COLUNMS = 20;
+const unsigned int ROWS = 40;
+
+Rectangle *rectangle = new Rectangle[COLUNMS * ROWS];
+
 glm::mat4 matrix_origem = glm::mat4(1);
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	if (key == GLFW_KEY_R) {
+		for (int i = 0; i < COLUNMS * ROWS; i++) {
+
+			rectangle[i].preencher(rand() % 256, rand() % 256, rand() % 256);
+
+		}
+	}
 }
 
+// Handler do clique do mouse
+void mouse_callback(GLFWwindow * window, int button, int action, int mods) {
+	if (action == GLFW_PRESS) {
+		switch (button)
+		{
+		case GLFW_MOUSE_BUTTON_LEFT:
+			double mx, my;
+			glfwGetCursorPos(window, &mx, &my);
+
+			int indice = -1;
+
+			for (int i = 0; i < COLUNMS * ROWS; i++) {
+
+				if (
+					mx > rectangle[i].width_min 
+					&& mx < rectangle[i].width_max
+					&& my > rectangle[i].height_min
+					&& my < rectangle[i].height_max
+				) {
+					
+					rectangle[i].visible = false;
+					indice = i;
+					break;
+
+				}
+			}
+
+			if (indice != -1) {
+
+				float porcentagem = (255 * 15) / 100;
+
+				for (int i = 0; i < COLUNMS * ROWS; i++) {
+
+					rectangle[indice].R;
+					rectangle[indice].G;
+					rectangle[indice].B;
+
+					rectangle[i].R;
+					rectangle[i].G;
+					rectangle[i].B;
+
+					float result = sqrt(
+						pow(rectangle[indice].R - rectangle[i].R, 2) + pow(rectangle[indice].G - rectangle[i].G, 2) + pow(rectangle[indice].B - rectangle[i].B, 2)
+					);
+
+					if (result < porcentagem) {
+						rectangle[i].visible = false;
+					}
+				}
+
+			}
+
+		}
+	}
+}
 
 int main() {
 	
@@ -53,15 +120,10 @@ int main() {
 	glewExperimental = GL_TRUE;
 	glewInit();
 
-	int COLUNMS = 20;
-	int ROWS = 40;
-
 	float tileWidth = SCR_WIDTH / COLUNMS;
 	float tileHeight = (SCR_HEIGHT - 50) / ROWS;
 
-	printf("%f - %f", tileWidth, tileHeight);
-
-	Rectangle *rectangle = new Rectangle[COLUNMS * ROWS];
+	
 
 	//s rand(mudar semente)
 	srand(time(NULL));
@@ -153,6 +215,7 @@ int main() {
 
 	glUseProgram(shader_programme);
 	glfwSetKeyCallback(g_window, key_callback);
+	glfwSetMouseButtonCallback(g_window, mouse_callback);
 	
 	glm::mat4 proj = glm::ortho(0.0f, (float) SCR_WIDTH, (float) SCR_HEIGHT, 0.0f, -1.0f, 1.0f);
 	glUniformMatrix4fv(
@@ -192,10 +255,15 @@ int main() {
 				columns = 0;
 				rows += 1;
 			}
+			
+			float deslocarColumn = (columns++) * tileWidth;
+			float deslocarRow = (rows)*tileHeight;
+			matrix_aux = glm::translate(glm::mat4(1), glm::vec3(deslocarColumn, deslocarRow, 0.0f));
 
-			if (!rectangle[i].visible) continue;
-
-			matrix_aux = glm::translate(glm::mat4(1), glm::vec3((columns++) * tileWidth, (rows)*tileHeight, 0.0f));
+			rectangle[i].height_min = deslocarRow;
+			rectangle[i].height_max = deslocarRow + tileHeight;
+			rectangle[i].width_min = deslocarColumn;
+			rectangle[i].width_max = deslocarColumn + tileWidth;
 
 			glUniformMatrix4fv(
 				glGetUniformLocation(shader_programme, "matrix"), 1,
@@ -211,6 +279,9 @@ int main() {
 			
 			glUniform1f(
 				glGetUniformLocation(shader_programme, "layer_z"), -0.45);
+
+
+			if (!rectangle[i].visible) continue;
 
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
