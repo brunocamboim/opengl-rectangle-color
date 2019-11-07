@@ -18,7 +18,7 @@ void processInput(GLFWwindow *window);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_HEIGHT = 650;
 
 glm::mat4 matrix_origem = glm::mat4(1);
 
@@ -53,14 +53,19 @@ int main() {
 	glewExperimental = GL_TRUE;
 	glewInit();
 
-	int height1 = SCR_WIDTH / 40;
-	int width1 = SCR_WIDTH / 20;
+	int COLUNMS = 20;
+	int ROWS = 40;
 
-	Rectangle *rectangle = new Rectangle[width1 * height1];
+	float tileWidth = SCR_WIDTH / COLUNMS;
+	float tileHeight = (SCR_HEIGHT - 50) / ROWS;
+
+	printf("%f - %f", tileWidth, tileHeight);
+
+	Rectangle *rectangle = new Rectangle[COLUNMS * ROWS];
 
 	//s rand(mudar semente)
 	srand(time(NULL));
-	for (int i = 0; i < width1 * height1; i++) {
+	for (int i = 0; i < COLUNMS * ROWS; i++) {
 
 		rectangle[i].preencher(rand() % 256, rand() % 256, rand() % 256);
 
@@ -68,10 +73,10 @@ int main() {
 
 	float vertices[] = {
 		// positions          // colors           // texture coords
-		0.0f, 20.0f, 0.0f,   1.0f, 1.0f, // buttom right
+		0.0f, tileHeight, 0.0f,   1.0f, 1.0f, // buttom right
 		0.0f, 0.0f, 0.0f,   1.0f, 0.0f, // top left
-		40.0f, 0.0f, 0.0f,   0.0f, 0.0f, // bottom left
-		40.0f, 20.0f, 0.0f,   0.0f, 1.0f //top right
+		tileWidth, 0.0f, 0.0f,   0.0f, 0.0f, // bottom left
+		tileWidth, tileHeight, 0.0f,   0.0f, 1.0f //top right
 	};
 
 	unsigned int indices[] = {
@@ -130,10 +135,6 @@ int main() {
 		"uniform vec3 color2;"
 
 		"void main () {"
-			/*"vec4 texel = texture (sprite, vec2((texture_coords.x + offsetx), texture_coords.y + offsety));"
-			"if (texel.a < 0.5) {"
-				"discard;"
-			"}"*/
 			"frag_color = vec4 (color2, 1.0);"
 		"}";
 
@@ -181,10 +182,9 @@ int main() {
 		
 		glUseProgram(shader_programme);
 
-		int indice = 0;
 		int columns = 0;
 		int rows = 0;
-		for (int i = 0; i < (width1 * height1); i++) {
+		for (int i = 0; i < (COLUNMS * ROWS); i++) {
 
 			glBindVertexArray(VAO);
 
@@ -193,12 +193,13 @@ int main() {
 				rows += 1;
 			}
 
-			matrix_aux = glm::translate(glm::mat4(1), glm::vec3((columns++) * 40, (rows)*20, 0.0f));
+			if (!rectangle[i].visible) continue;
+
+			matrix_aux = glm::translate(glm::mat4(1), glm::vec3((columns++) * tileWidth, (rows)*tileHeight, 0.0f));
 
 			glUniformMatrix4fv(
 				glGetUniformLocation(shader_programme, "matrix"), 1,
 				GL_FALSE, glm::value_ptr(matrix_aux));
-
 
 			glm::vec3 lightColor((float) rectangle[i].R / 255, (float) rectangle[i].G / 255, (float)rectangle[i].B / 255);
 			glUniform3fv(glGetUniformLocation(shader_programme, "color2"), 1,
@@ -211,20 +212,9 @@ int main() {
 			glUniform1f(
 				glGetUniformLocation(shader_programme, "layer_z"), -0.45);
 
-			//glUniform1i(glGetUniformLocation(shader_programme, "sprite"), 0);
-			/*glUniform1f(
-				glGetUniformLocation(shader_programme, "offsetx"), 0);
-
-			glUniform1f(
-				glGetUniformLocation(shader_programme, "offsety"), 1);*/
-			/*glUniform1f(
-				glGetUniformLocation(shader_programme, "imagem"), 1);*/
-
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		}		
-
-		teste = true;
 
 		glfwSwapBuffers(g_window);
 		glfwPollEvents();
