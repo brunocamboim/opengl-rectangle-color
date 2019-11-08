@@ -23,6 +23,10 @@ const unsigned int SCR_HEIGHT = 650;
 const unsigned int COLUNMS = 20;
 const unsigned int ROWS = 40;
 
+int jogadas = 0;
+float points = 0.0f;
+int base_points[] = { 10, 5, 2, 1 };
+
 Rectangle *rectangle = new Rectangle[COLUNMS * ROWS];
 
 glm::mat4 matrix_origem = glm::mat4(1);
@@ -30,6 +34,7 @@ glm::mat4 matrix_origem = glm::mat4(1);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_R) {
+		jogadas = 0;
 		for (int i = 0; i < COLUNMS * ROWS; i++) {
 
 			rectangle[i].preencher(rand() % 256, rand() % 256, rand() % 256);
@@ -40,7 +45,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 // Handler do clique do mouse
 void mouse_callback(GLFWwindow * window, int button, int action, int mods) {
-	if (action == GLFW_PRESS) {
+	if (action == GLFW_PRESS && jogadas < 4) {
 		switch (button)
 		{
 		case GLFW_MOUSE_BUTTON_LEFT:
@@ -56,6 +61,7 @@ void mouse_callback(GLFWwindow * window, int button, int action, int mods) {
 					&& mx < rectangle[i].width_max
 					&& my > rectangle[i].height_min
 					&& my < rectangle[i].height_max
+					&& rectangle[i].visible
 				) {
 					
 					rectangle[i].visible = false;
@@ -85,12 +91,16 @@ void mouse_callback(GLFWwindow * window, int button, int action, int mods) {
 
 					if (result < porcentagem) {
 						rectangle[i].visible = false;
+						points += base_points[jogadas];
 					}
 				}
+
+				jogadas++;
 
 			}
 
 		}
+
 	}
 }
 
