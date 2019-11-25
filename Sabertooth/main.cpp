@@ -95,6 +95,8 @@ void mouse_callback(GLFWwindow * window, int button, int action, int mods) {
 					}
 				}
 
+				printf("Pontos: %f \n\n", points);
+
 				jogadas++;
 
 			}
